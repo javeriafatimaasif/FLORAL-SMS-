@@ -1,0 +1,28 @@
+[
+  {
+    "id": "1FCC8110",
+    "name": "Natasha Baig",
+    "email": "xyz@gmail.com",
+    "age": "21",
+    "department": "Artificial Intelligence",
+    "year": "3",
+    "gpa": "3.7",
+    "phone": "00",
+    "status": "Active",
+    "enrolled": "April 29, 2026",
+    "avatar_color": "#fde68a"
+  },
+  {
+    "id": "41A82ECE",
+    "name": "Faryal Mughal",
+    "email": "xyz@gmail.com",
+    "age": "19",
+    "department": "English Literature",
+    "year": "1",
+    "gpa": "3.9",
+    "phone": "000",
+    "status": "Active",
+    "enrolled": "April 29, 2026",
+    "avatar_color": "#c084fc"
+  }
+]

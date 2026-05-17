@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Student Management System{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --blush:      #fce7f3;
+      --rose:       #fbcfe8;
+      --petal:      #f9a8d4;
+      --bloom:      #ec4899;
+      --deep:       #be185d;
+      --lavender:   #f3e8ff;
+      --lilac:      #d8b4fe;
+      --mint:       #d1fae5;
+      --sage:       #a7f3d0;
+      --cream:      #fff9f5;
+      --butter:     #fef9c3;
+      --sky:        #e0f2fe;
+      --text-dark:  #4a1942;
+      --text-mid:   #7e3a72;
+      --text-light: #c084fc;
+      --shadow:     rgba(236,72,153,0.15);
+      --glass:      rgba(255,255,255,0.6);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── ANIMATED BACKGROUND ── */
+    body::before {
+      content:'';
+      position:fixed; inset:0; z-index:0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, #fce7f388 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 80% 80%, #f3e8ff88 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, #fbcfe866 0%, transparent 70%);
+      animation: bgShift 12s ease-in-out infinite alternate;
+    }
+    @keyframes bgShift {
+      0%   { opacity:1; transform: scale(1); }
+      100% { opacity:.85; transform: scale(1.05); }
+    }
+
+    /* Floating petals */
+    .petal-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .petal { position:absolute; font-size:1.4rem; opacity:.35; animation: floatPetal linear infinite; }
+    @keyframes floatPetal {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity:.4; }
+      100% { transform: translateY(-10vh) rotate(720deg); opacity:0; }
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: sticky; top:0; z-index:100;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(18px);
+      border-bottom: 1.5px solid var(--rose);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+      box-shadow: 0 4px 30px var(--shadow);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: .8rem;
+      text-decoration: none;
+    }
+    .nav-logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--petal), var(--lilac));
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 14px var(--shadow);
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+    @keyframes logoFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+    .nav-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--deep);
+      line-height: 1.1;
+    }
+    .nav-title small {
+      display:block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .68rem;
+      font-weight: 400;
+      color: var(--text-light);
+      letter-spacing: .05em;
+    }
+    .nav-links { display:flex; align-items:center; gap:.4rem; }
+    .nav-link {
+      padding: .45rem 1rem;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: .88rem;
+      font-weight: 500;
+      color: var(--text-mid);
+      transition: all .25s;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: var(--rose);
+      color: var(--deep);
+    }
+    .nav-link.cta {
+      background: linear-gradient(135deg, var(--petal), var(--bloom));
+      color: #fff;
+      box-shadow: 0 4px 16px var(--shadow);
+    }
+    .nav-link.cta:hover { transform:translateY(-2px); box-shadow:0 6px 20px var(--shadow); }
+
+    /* ── MAIN ── */
+    main { position:relative; z-index:1; padding: 2rem; max-width: 1280px; margin:0 auto; }
+
+    /* ── FLASH MESSAGES ── */
+    .flashes { margin-bottom:1.5rem; }
+    .flash {
+      padding: .9rem 1.4rem;
+      border-radius: 16px;
+      margin-bottom: .6rem;
+      font-size: .9rem;
+      display: flex; align-items: center; gap: .7rem;
+      animation: slideIn .4s ease;
+      backdrop-filter: blur(10px);
+    }
+    @keyframes slideIn { from{transform:translateY(-12px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+    .flash.success { background: #dcfce7cc; color:#166534; border:1px solid #bbf7d0; }
+    .flash.info    { background: #e0f2fecc; color:#0c4a6e; border:1px solid #bae6fd; }
+    .flash.error   { background: #fee2e2cc; color:#991b1b; border:1px solid #fecaca; }
+
+    /* ── GLASS CARD ── */
+    .glass {
+      background: rgba(255,255,255,0.68);
+      backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(249,168,212,.3);
+      border-radius: 24px;
+      box-shadow: 0 8px 40px var(--shadow), 0 1px 0 rgba(255,255,255,.9) inset;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .6rem 1.4rem;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all .22s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--petal), var(--bloom));
+      color: #fff;
+      box-shadow: 0 4px 16px var(--shadow);
+    }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 22px rgba(236,72,153,.35); }
+    .btn-soft {
+      background: var(--blush);
+      color: var(--deep);
+      border: 1.5px solid var(--rose);
+    }
+    .btn-soft:hover { background: var(--rose); transform:translateY(-1px); }
+    .btn-danger {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1.5px solid #fca5a5;
+    }
+    .btn-danger:hover { background: #fca5a5; }
+    .btn-sm { padding: .4rem .9rem; font-size: .8rem; }
+    .btn-xs { padding: .28rem .7rem; font-size: .75rem; }
+
+    /* ── FORM INPUTS ── */
+    .form-group { margin-bottom: 1.3rem; }
+    .form-label {
+      display: block;
+      font-size: .83rem;
+      font-weight: 500;
+      color: var(--text-mid);
+      margin-bottom: .4rem;
+      letter-spacing: .02em;
+    }
+    .form-control {
+      width: 100%;
+      padding: .7rem 1.1rem;
+      border-radius: 14px;
+      border: 1.5px solid var(--rose);
+      background: rgba(255,255,255,.85);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--text-dark);
+      transition: all .2s;
+      outline: none;
+    }
+    .form-control:focus {
+      border-color: var(--petal);
+      box-shadow: 0 0 0 3px rgba(249,168,212,.25);
+    }
+    select.form-control { cursor: pointer; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index:1;
+      text-align: center;
+      padding: 2.5rem 2rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--text-mid);
+      border-top: 1px solid var(--rose);
+      background: rgba(252,231,243,.4);
+    }
+    footer span { color: var(--bloom); font-weight: 600; }
+
+    /* Scroll bar */
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: var(--blush); }
+    ::-webkit-scrollbar-thumb { background: var(--petal); border-radius:10px; }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Floating petals -->
+<div class="petal-layer" id="petalLayer"></div>
+
+<nav>
+  <a href="{{ url_for('index') }}" class="nav-brand">
+    <div class="nav-logo">🌸</div>
+    <div class="nav-title">
+      Student Management System
+      <small>✿ Garden of Knowledge ✿</small>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}" class="nav-link"><i class="fa fa-home"></i> Dashboard</a>
+    <a href="{{ url_for('add_student') }}" class="nav-link cta"><i class="fa fa-plus"></i> Add Student</a>
+  </div>
+</nav>
+
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  Crafted with 🌸 love &amp; petals &nbsp;·&nbsp; Designed by <span>Javyriyah Fatima</span> &nbsp;·&nbsp; Student Management System &copy; {{ 2024 }}
+</footer>
+
+<script>
+// Generate floating petals
+const emojis = ['🌸','🌷','🌺','🌼','🌻','💮','🪷','✿','❀','🌹'];
+const layer = document.getElementById('petalLayer');
+for(let i=0; i<22; i++){
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.cssText = `
+    left:${Math.random()*100}%;
+    font-size:${.8+Math.random()*1.2}rem;
+    animation-duration:${10+Math.random()*18}s;
+    animation-delay:${-Math.random()*20}s;
+    opacity:${.15+Math.random()*.3};
+  `;
+  layer.appendChild(p);
+}
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

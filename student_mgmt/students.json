@@ -1,0 +1,54 @@
+[
+  {
+    "id": "A1B2C3D4",
+    "name": "Ayesha Malik",
+    "email": "ayesha.malik@uni.edu",
+    "age": "21",
+    "department": "Computer Science",
+    "year": "3",
+    "gpa": "3.8",
+    "phone": "+92 300 1234567",
+    "status": "Active",
+    "enrolled": "September 12, 2022",
+    "avatar_color": "#f9a8d4"
+  },
+  {
+    "id": "E5F6G7H8",
+    "name": "Sara Ahmed",
+    "email": "sara.ahmed@uni.edu",
+    "age": "20",
+    "department": "Software Engineering",
+    "year": "2",
+    "gpa": "3.5",
+    "phone": "+92 321 9876543",
+    "status": "Active",
+    "enrolled": "September 08, 2023",
+    "avatar_color": "#c084fc"
+  },
+  {
+    "id": "I9J0K1L2",
+    "name": "Zara Khan",
+    "email": "zara.khan@uni.edu",
+    "age": "22",
+    "department": "Data Science",
+    "year": "4",
+    "gpa": "3.2",
+    "phone": "+92 333 5554321",
+    "status": "On Leave",
+    "enrolled": "August 22, 2021",
+    "avatar_color": "#67e8f9"
+  },
+  {
+    "id": "M3N4O5P6",
+    "name": "Hina Fatima",
+    "email": "hina.f@uni.edu",
+    "age": "19",
+    "department": "Artificial Intelligence",
+    "year": "1",
+    "gpa": "3.9",
+    "phone": "+92 315 7778899",
+    "status": "Active",
+    "enrolled": "September 04, 2024",
+    "avatar_color": "#86efac"
+  }
+]

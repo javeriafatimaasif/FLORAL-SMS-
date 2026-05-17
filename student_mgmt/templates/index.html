@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Student Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem;
+}
+.hero-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--bloom);
+  margin-bottom: .6rem;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 600;
+  color: var(--deep);
+  line-height: 1.15;
+  margin-bottom: .6rem;
+}
+.hero h1 em { font-style: italic; color: var(--bloom); }
+.hero p {
+  color: var(--text-mid);
+  font-size: 1rem;
+  font-weight: 300;
+  max-width: 500px;
+  margin: 0 auto 1.8rem;
+}
+.hero-divider {
+  display: flex; align-items:center; justify-content:center; gap:.8rem;
+  color: var(--petal); font-size:1.3rem; margin-bottom:2rem;
+}
+
+/* ── STATS ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2.2rem;
+}
+.stat-card {
+  padding: 1.6rem;
+  border-radius: 22px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s;
+}
+.stat-card:hover { transform: translateY(-4px); }
+.stat-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background: inherit;
+  filter: blur(0);
+  z-index:-1;
+}
+.stat-card.pink   { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border:1.5px solid #f9a8d4; }
+.stat-card.purple { background: linear-gradient(135deg, #f3e8ff, #ede9fe); border:1.5px solid #d8b4fe; }
+.stat-card.mint   { background: linear-gradient(135deg, #d1fae5, #a7f3d0); border:1.5px solid #6ee7b7; }
+.stat-card.sky    { background: linear-gradient(135deg, #e0f2fe, #bae6fd); border:1.5px solid #7dd3fc; }
+.stat-icon { font-size: 2rem; margin-bottom: .5rem; }
+.stat-num  {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--deep);
+  line-height: 1;
+  margin-bottom: .2rem;
+}
+.stat-lbl  { font-size: .8rem; color: var(--text-mid); letter-spacing: .04em; }
+
+/* ── SEARCH & FILTER ── */
+.toolbar {
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+.search-wrap {
+  flex:1; min-width:240px;
+  position: relative;
+}
+.search-wrap i {
+  position:absolute; left:1rem; top:50%;
+  transform:translateY(-50%);
+  color: var(--petal);
+  font-size:.95rem;
+}
+.search-input {
+  width:100%;
+  padding: .7rem 1rem .7rem 2.6rem;
+  border-radius: 50px;
+  border: 1.5px solid var(--rose);
+  background: rgba(255,255,255,.85);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  color: var(--text-dark);
+  outline:none;
+  transition: all .2s;
+}
+.search-input:focus { border-color:var(--petal); box-shadow:0 0 0 3px rgba(249,168,212,.2); }
+.filter-select {
+  padding: .65rem 1.1rem;
+  border-radius: 50px;
+  border: 1.5px solid var(--rose);
+  background: rgba(255,255,255,.85);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  color: var(--text-mid);
+  cursor: pointer;
+  outline: none;
+}
+
+/* ── TABLE ── */
+.table-wrap {
+  overflow: hidden;
+  border-radius: 22px;
+}
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.student-table thead th {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-size: .78rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  background: rgba(249,168,212,.12);
+  border-bottom: 1.5px solid var(--rose);
+}
+.student-table tbody tr {
+  transition: background .18s;
+  border-bottom: 1px solid rgba(249,168,212,.2);
+  animation: rowIn .4s ease both;
+}
+@keyframes rowIn { from{opacity:0;transform:translateX(-8px);} to{opacity:1;transform:none;} }
+.student-table tbody tr:hover { background: rgba(252,231,243,.5); }
+.student-table tbody td { padding: .9rem 1.2rem; font-size: .9rem; }
+
+.avatar {
+  width:38px; height:38px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:600; font-size:.95rem;
+  color:#fff;
+  flex-shrink:0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.student-name-cell { display:flex; align-items:center; gap:.8rem; }
+.student-name { font-weight:500; color: var(--text-dark); }
+.student-id   { font-size:.73rem; color:var(--text-light); }
+
+.badge {
+  display: inline-block;
+  padding: .22rem .7rem;
+  border-radius: 50px;
+  font-size: .73rem;
+  font-weight: 500;
+}
+.badge-active   { background:#dcfce7; color:#166534; }
+.badge-inactive { background:#fee2e2; color:#991b1b; }
+.badge-leave    { background:#fef9c3; color:#854d0e; }
+
+.gpa-bar-wrap { display:flex; align-items:center; gap:.6rem; }
+.gpa-bar {
+  width:60px; height:6px;
+  background: var(--rose);
+  border-radius:10px;
+  overflow:hidden;
+}
+.gpa-bar-fill {
+  height:100%;
+  border-radius:10px;
+  background: linear-gradient(90deg, var(--petal), var(--bloom));
+}
+
+.actions { display:flex; gap:.4rem; flex-wrap:wrap; }
+
+/* Empty state */
+.empty {
+  text-align:center;
+  padding: 4rem 2rem;
+  color: var(--text-mid);
+}
+.empty-icon { font-size:3.5rem; margin-bottom:1rem; animation: bounce 2s ease infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+
+/* LIVE SEARCH DROPDOWN */
+#searchResults {
+  position:absolute; top:calc(100% + 6px); left:0; right:0;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(16px);
+  border:1.5px solid var(--rose);
+  border-radius:16px;
+  box-shadow:0 8px 32px var(--shadow);
+  z-index:200;
+  overflow:hidden;
+  display:none;
+}
+.sr-item {
+  padding:.7rem 1.2rem;
+  cursor:pointer;
+  display:flex; align-items:center; gap:.8rem;
+  transition:background .15s;
+  text-decoration:none; color:inherit;
+}
+.sr-item:hover { background:var(--blush); }
+.sr-name { font-weight:500; font-size:.88rem; }
+.sr-meta { font-size:.75rem; color:var(--text-light); }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">✿ Welcome to the Garden of Knowledge ✿</div>
+  <h1>Student Management<br/><em>System</em></h1>
+  <p>Where every student blooms 🌸 Track, nurture, and celebrate every learner's journey.</p>
+  <div class="hero-divider">🌷 ── ✿ ── 🌷</div>
+</div>
+
+<!-- STATS -->
+<div class="stats-grid">
+  <div class="stat-card pink glass">
+    <div class="stat-icon">🌸</div>
+    <div class="stat-num">{{ total }}</div>
+    <div class="stat-lbl">Total Students</div>
+  </div>
+  <div class="stat-card purple glass">
+    <div class="stat-icon">✨</div>
+    <div class="stat-num">{{ avg_gpa }}</div>
+    <div class="stat-lbl">Average GPA</div>
+  </div>
+  <div class="stat-card mint glass">
+    <div class="stat-icon">🌿</div>
+    <div class="stat-num">{{ departments|length }}</div>
+    <div class="stat-lbl">Departments</div>
+  </div>
+  <div class="stat-card sky glass">
+    <div class="stat-icon">🎓</div>
+    <div class="stat-num">{{ students|selectattr('status','equalto','Active')|list|length }}</div>
+    <div class="stat-lbl">Active Students</div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <i class="fa fa-search"></i>
+    <input type="text" class="search-input" id="liveSearch" placeholder="Search by name, department, ID…"/>
+    <div id="searchResults"></div>
+  </div>
+  <select class="filter-select" id="deptFilter" onchange="filterTable()">
+    <option value="">🌺 All Departments</option>
+    {% for d in departments %}
+    <option value="{{ d }}">{{ d }}</option>
+    {% endfor %}
+  </select>
+  <select class="filter-select" id="statusFilter" onchange="filterTable()">
+    <option value="">🌼 All Status</option>
+    <option>Active</option>
+    <option>Inactive</option>
+    <option>On Leave</option>
+  </select>
+  <a href="{{ url_for('add_student') }}" class="btn btn-primary"><i class="fa fa-plus"></i> Add Student</a>
+</div>
+
+<!-- TABLE -->
+<div class="glass table-wrap">
+  {% if students %}
+  <table class="student-table" id="studentTable">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Department</th>
+        <th>Year</th>
+        <th>GPA</th>
+        <th>Status</th>
+        <th>Enrolled</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr data-dept="{{ s.department }}" data-status="{{ s.status }}" data-name="{{ s.name|lower }}">
+        <td>
+          <div class="student-name-cell">
+            <div class="avatar" style="background:{{ s.avatar_color or '#f9a8d4' }}">
+              {{ s.name[0].upper() }}
+            </div>
+            <div>
+              <div class="student-name">{{ s.name }}</div>
+              <div class="student-id">#{{ s.id }} · {{ s.email }}</div>
+            </div>
+          </div>
+        </td>
+        <td>{{ s.department }}</td>
+        <td>Year {{ s.year }}</td>
+        <td>
+          <div class="gpa-bar-wrap">
+            <span>{{ s.gpa }}</span>
+            <div class="gpa-bar">
+              <div class="gpa-bar-fill" style="width:{{ ((s.gpa|float) / 4.0 * 100)|round }}%"></div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="badge {% if s.status == 'Active' %}badge-active{% elif s.status == 'Inactive' %}badge-inactive{% else %}badge-leave{% endif %}">
+            {{ s.status }}
+          </span>
+        </td>
+        <td style="font-size:.82rem; color:var(--text-light);">{{ s.enrolled }}</td>
+        <td>
+          <div class="actions">
+            <a href="{{ url_for('view_student', student_id=s.id) }}" class="btn btn-soft btn-xs" title="View">👁</a>
+            <a href="{{ url_for('edit_student', student_id=s.id) }}" class="btn btn-soft btn-xs" title="Edit">✏️</a>
+            <form method="POST" action="{{ url_for('delete_student', student_id=s.id) }}" style="display:inline" onsubmit="return confirm('Remove this student from the garden? 🍂')">
+              <button type="submit" class="btn btn-danger btn-xs" title="Delete">🗑</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">
+    <div class="empty-icon">🌱</div>
+    <p style="font-family:'Playfair Display',serif; font-size:1.3rem; margin-bottom:.5rem;">The garden is empty!</p>
+    <p style="font-size:.9rem;">Plant your first student seed 🌸</p>
+    <br/>
+    <a href="{{ url_for('add_student') }}" class="btn btn-primary">Add First Student</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Live search
+const liveSearch = document.getElementById('liveSearch');
+const searchResults = document.getElementById('searchResults');
+
+liveSearch.addEventListener('input', async function(){
+  const q = this.value.trim();
+  if(q.length < 2){ searchResults.style.display='none'; filterTable(); return; }
+  const res = await fetch(`/search?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
+  if(!data.length){ searchResults.style.display='none'; filterTable(); return; }
+  searchResults.innerHTML = data.slice(0,6).map(s=>`
+    <a class="sr-item" href="/view/${s.id}">
+      <div class="avatar" style="background:${s.avatar_color||'#f9a8d4'};width:30px;height:30px;font-size:.8rem;">${s.name[0].toUpperCase()}</div>
+      <div>
+        <div class="sr-name">${s.name}</div>
+        <div class="sr-meta">#${s.id} · ${s.department}</div>
+      </div>
+    </a>`).join('');
+  searchResults.style.display='block';
+  filterTable(q);
+});
+
+document.addEventListener('click', e=>{ if(!liveSearch.contains(e.target)) searchResults.style.display='none'; });
+
+function filterTable(searchTerm){
+  const dept = document.getElementById('deptFilter').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value.toLowerCase();
+  const term = (searchTerm !== undefined ? searchTerm : liveSearch.value).toLowerCase();
+  document.querySelectorAll('#studentTable tbody tr').forEach(row=>{
+    const matchDept   = !dept   || row.dataset.dept.toLowerCase().includes(dept);
+    const matchStatus = !status || row.dataset.status.toLowerCase() === status;
+    const matchName   = !term   || row.dataset.name.includes(term);
+    row.style.display = (matchDept && matchStatus && matchName) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

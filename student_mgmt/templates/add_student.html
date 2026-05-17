@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Add Student · SMS{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-header {
+  text-align:center; padding:2rem 1rem 1.5rem;
+}
+.page-header h2 {
+  font-family:'Playfair Display',serif;
+  font-size:2.2rem; color:var(--deep); margin-bottom:.4rem;
+}
+.page-header p { color:var(--text-mid); font-size:.95rem; }
+
+.form-card {
+  max-width:740px; margin:0 auto;
+  padding:2.5rem;
+}
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+.form-grid .span2 { grid-column:1/-1; }
+
+.avatar-picker { display:flex; gap:.7rem; flex-wrap:wrap; align-items:center; }
+.avatar-swatch {
+  width:32px; height:32px; border-radius:50%;
+  cursor:pointer; border:3px solid transparent;
+  transition:all .18s;
+}
+.avatar-swatch.selected, .avatar-swatch:hover { border-color:var(--deep); transform:scale(1.15); }
+
+.section-label {
+  font-family:'Playfair Display',serif;
+  font-size:1rem; font-style:italic;
+  color:var(--deep); margin-bottom:.8rem; margin-top:.4rem;
+  border-left:3px solid var(--petal); padding-left:.7rem;
+}
+
+.form-actions {
+  display:flex; gap:1rem; justify-content:flex-end; margin-top:1.5rem;
+  padding-top:1.2rem; border-top:1px solid var(--rose);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div style="font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--bloom);margin-bottom:.5rem;">🌱 Plant a New Seed</div>
+  <h2>Add New Student</h2>
+  <p>Fill in the petals below to add a student to your garden</p>
+</div>
+
+<div class="glass form-card">
+  <form method="POST" action="{{ url_for('add_student') }}">
+    <div class="section-label">🌸 Personal Information</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Full Name *</label>
+        <input type="text" name="name" class="form-control" placeholder="e.g. Aisha Khan" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address *</label>
+        <input type="email" name="email" class="form-control" placeholder="student@uni.edu" required/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Age</label>
+        <input type="number" name="age" class="form-control" placeholder="20" min="16" max="60"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input type="text" name="phone" class="form-control" placeholder="+92 300 0000000"/>
+      </div>
+    </div>
+
+    <div class="section-label">🎓 Academic Details</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Department *</label>
+        <select name="department" class="form-control" required>
+          <option value="" disabled selected>Select department…</option>
+          <option>Computer Science</option>
+          <option>Software Engineering</option>
+          <option>Business Administration</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Psychology</option>
+          <option>English Literature</option>
+          <option>Data Science</option>
+          <option>Artificial Intelligence</option>
+          <option>Cybersecurity</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year of Study *</label>
+        <select name="year" class="form-control" required>
+          <option value="" disabled selected>Select year…</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">GPA (0.0 – 4.0)</label>
+        <input type="number" name="gpa" class="form-control" placeholder="3.5" step="0.01" min="0" max="4"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-control">
+          <option>Active</option>
+          <option>Inactive</option>
+          <option>On Leave</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-label">🎨 Choose Avatar Color</div>
+    <div class="form-group">
+      <div class="avatar-picker" id="avatarPicker">
+        {% for color in ['#f9a8d4','#c084fc','#67e8f9','#86efac','#fca5a5','#fdba74','#fde68a','#a5b4fc','#f0abfc','#6ee7b7'] %}
+        <div class="avatar-swatch {% if loop.first %}selected{% endif %}"
+             style="background:{{ color }}"
+             data-color="{{ color }}"
+             onclick="selectColor(this)"></div>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="avatar_color" id="avatarColorInput" value="#f9a8d4"/>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('index') }}" class="btn btn-soft">🏡 Back to Garden</a>
+      <button type="submit" class="btn btn-primary">🌸 Add to Garden</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectColor(el){
+  document.querySelectorAll('.avatar-swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('avatarColorInput').value = el.dataset.color;
+}
+</script>
+{% endblock %}
